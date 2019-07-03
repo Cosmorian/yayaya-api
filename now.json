@@ -12,8 +12,6 @@
     {
       "src": "/games", "dest": "/api/handlers/games/index.ts"
     }
-  ],
-  "env": {
-  }
+  ]
 }
 
