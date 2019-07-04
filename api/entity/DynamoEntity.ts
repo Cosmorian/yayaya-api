@@ -12,16 +12,16 @@ export const ddb = new AWS.DynamoDB.DocumentClient({
   region: 'ap-northeast-2',
 });
 
-export default abstract class DynamoEntity {
-  gameId: string;
+export default class DynamoEntity {
+  gameId: number;
 
   static tableName = `yayaya`;
 
-  static async getItem(id: string) {
+  static async getItem(gameId: number) {
     return ddb.get({
       TableName: this.tableName,
       Key: {
-        id,
+        gameId,
       },
     }).promise();
   }

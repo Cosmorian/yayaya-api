@@ -4,8 +4,9 @@ const app = getApp();
 app.get('*', async (req, res) => {
   const { games = '' } = req.query;
   if (!games) {
-    res.status(400).json('Bad Request');
+    return res.status(400).json('Bad Request');
   }
+  res.json(200);
 });
 
 export default app;
