@@ -10,7 +10,7 @@
   ],
   "routes": [
     {
-      "src": "/games", "dest": "/api/handlers/games/index.ts"
+      "src": "/api/games", "dest": "/api/handlers/games/index.ts"
     }
   ]
 }
