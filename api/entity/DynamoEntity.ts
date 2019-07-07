@@ -14,6 +14,10 @@ export const ddb = new AWS.DynamoDB.DocumentClient({
 
 export default abstract class DynamoEntity {
   gameId: string;
+  result: number;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string;
 
   static tableName = `yayaya`;
 
@@ -24,6 +28,15 @@ export default abstract class DynamoEntity {
         id,
       },
     }).promise();
+  }
+
+  static async queryIds(ids: number[]) {
+    const query = { RequestItems: {} };
+    query.RequestItems[this.tableName] = {
+      Keys: ids.map(i => ({ gameId: i })),
+      ProjectionExpression: 'gameId',
+    };
+    return ddb.batchGet(query).promise();
   }
 
 }
