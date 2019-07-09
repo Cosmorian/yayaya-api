@@ -7,6 +7,7 @@ app.get('*', async (req, res) => {
   if (!games) {
     return res.status(400).json('Bad Request');
   }
+  res.json(200);
   games = games
     .split(',')
     .filter(g => g)
