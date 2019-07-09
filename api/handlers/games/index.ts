@@ -11,8 +11,14 @@ app.get('*', async (req, res) => {
     .split(',')
     .filter(g => g)
     .map(g => Number(g));
-  const response = await DynamoEntity.queryIds(games);
-  console.log('response : ', response);
+  const { Responses: { yayaya = [] } } = await DynamoEntity.queryIds(games);
+  const yayayaIds = yayaya.map(ya => (ya && ya.gameId)).filter(i => i);
+  const promises = games.map((game) => {
+    if (yayayaIds.indexOf(game) === -1) {
+      console.log('game', game);
+    }
+  }).filter(r => r);
+  console.log('responses : ', games);
   res.json({ data: games });
 });
 

@@ -39,4 +39,15 @@ export default abstract class DynamoEntity {
     return ddb.batchGet(query).promise();
   }
 
+  static async putItem(id: number) {
+    return ddb.put({
+      TableName: this.tableName,
+      ConditionExpression: `attribute_not_exists(gameId)`,
+      Item: {
+        gameId: id,
+        result: Math.floor(Math.random() * 3),
+      },
+    });
+  }
+
 }
