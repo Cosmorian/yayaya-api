@@ -47,6 +47,8 @@ export default class DynamoEntity {
         gameId: id,
         result: Math.floor(Math.random() * 3),
       },
+    }).promise().catch((e) => {
+      console.log('error : ', e);
     });
   }
 
