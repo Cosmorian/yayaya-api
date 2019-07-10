@@ -11,18 +11,18 @@ app.get('*', async (req, res) => {
     .split(',')
     .filter(g => g)
     .map(g => Number(g));
-  let yayaya = await getGames(games);
-  const yayayaIds = yayaya.map(ya => (ya && ya.gameId)).filter(i => i);
+  let results = await getGames(games);
+  const existsIds = results.map(ya => (ya && ya.gameId)).filter(i => i);
   const promises = games.map((game) => {
-    if (yayayaIds.indexOf(game) === -1) {
+    if (existsIds.indexOf(game) === -1) {
       return DynamoEntity.putItem(game);
     }
   }).filter(r => r);
   if (promises.length) {
     await Promise.all(promises);
-    yayaya = await getGames(games);
+    results = await getGames(games);
   }
-  res.json({ data: games });
+  res.json({ data: results });
 });
 
 async function getGames(games: number[]) {

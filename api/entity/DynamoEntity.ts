@@ -34,7 +34,6 @@ export default class DynamoEntity {
     const query = { RequestItems: {} };
     query.RequestItems[this.tableName] = {
       Keys: ids.map(i => ({ gameId: i })),
-      ProjectionExpression: 'gameId',
     };
     return ddb.batchGet(query).promise();
   }
