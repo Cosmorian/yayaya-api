@@ -16,7 +16,7 @@ app.get('*', async (req, res) => {
     roundedNow,
   }).arr.reverse();
   let gameState = 'ready';
-  if (nowS >= 200000) {
+  if (nowS >= 20000) {
     gameState = nowS < 40000 ? 'onprogress' : 'done';
   }
   let results = await getGames(list);
