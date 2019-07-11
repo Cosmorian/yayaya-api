@@ -21,11 +21,9 @@ app.get('*', async (req, res) => {
   }
   let results = await getGames(list);
   const existsIds = results.map(ya => (ya && ya.gameId)).filter(i => i);
-  const promises = list.map((game) => {
-    if (existsIds.indexOf(game) === -1) {
-      return DynamoEntity.putItem(game);
-    }
-  }).filter(r => r);
+  const promises = list
+    .map(g => existsIds.indexOf(g) === -1 && DynamoEntity.putItem(g))
+    .filter(r => r);
   if (promises.length) {
     await Promise.all(promises);
     results = await getGames(list);
