@@ -20,7 +20,9 @@ app.get('*', async (req, res) => {
     gameState = nowS < 40000 ? 'onprogress' : 'done';
   }
   let results = await getGames(list);
-  const existsIds = results.map(ya => (ya && ya.gameId)).filter(i => i);
+  const existsIds = results
+    .map(ya => (ya && ya.gameId))
+    .filter(i => i);
   const promises = list
     .map(g => existsIds.indexOf(g) === -1 && DynamoEntity.putItem(g))
     .filter(r => r);
