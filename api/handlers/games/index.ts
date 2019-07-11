@@ -16,8 +16,8 @@ app.get('*', async (req, res) => {
     roundedNow,
   }).arr.reverse();
   let gameState = 'ready';
-  if (nowS >= 20) {
-    gameState = nowS < 40 ? 'onprogress' : 'done';
+  if (nowS >= 200000) {
+    gameState = nowS < 40000 ? 'onprogress' : 'done';
   }
   let results = await getGames(list);
   const existsIds = results.map(ya => (ya && ya.gameId)).filter(i => i);
