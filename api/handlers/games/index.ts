@@ -8,7 +8,7 @@ function createNArray(n = 0) {
 
 app.get('*', async (req, res) => {
   const { nowS, roundedNow } = getRoundedNow();
-  const list = createNArray(20).reduce((acc, item) => {
+  const list = createNArray(100).reduce((acc, item) => {
     acc.arr[item] = (acc.roundedNow - (60000 * item));
     return acc;
   }, {
@@ -24,7 +24,15 @@ app.get('*', async (req, res) => {
     .map(ya => (ya && ya.gameId))
     .filter(i => i);
   const promises = list
-    .map(g => existsIds.indexOf(g) === -1 && DynamoEntity.putItem(g))
+    .map(g => {
+      if (existsIds.indexOf(g) === -1) {
+        // 현재 스테이지의 게임의 상태가 done 아니면 putItem하지 않는다.
+        if (g === roundedNow && gameState !== 'done') {
+          return null;
+        }
+        return DynamoEntity.putItem(g);
+      }
+    })
     .filter(r => r);
   if (promises.length) {
     await Promise.all(promises);
@@ -33,7 +41,10 @@ app.get('*', async (req, res) => {
   res.json({
     data: {
       results,
-      gameState,
+      gameState: {
+        state: gameState,
+        ts: roundedNow,
+      },
     },
   });
 });
