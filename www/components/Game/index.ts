@@ -51,7 +51,6 @@ export default class Yayaya {
                     window.cancelAnimationFrame(this.renderData.stopAnimation);
                     const res = await getGames();
                     this.setBallPosition(res.data.data.results[0].result);
-                    console.log('res.data.data.results[0].result : ', res.data.data.results[0].result);
                     setTimeout(() => {
                         this.end(performance.now(), 1, {x: 0, y: this.absolutePositionValue[0].y} )
                     }, 500);
@@ -198,7 +197,7 @@ export default class Yayaya {
     }
 
   setBallPosition(position) {
-    const ya = this.yas[position];
+    const ya = this.yas.find(ya => ya.position === position + 1);
     const imageWidth = this.canvas.width / 10;
     const imageHeight = imageWidth * (this.ballImage.height / this.ballImage.width);
     const x = (ya.x + (ya.imageInfo.width / 2)) - (imageWidth / 2);
