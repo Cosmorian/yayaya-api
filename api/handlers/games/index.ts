@@ -26,7 +26,7 @@ app.get('*', async (req, res) => {
   const promises = list
     .map(g => {
       if (existsIds.indexOf(g) === -1) {
-        // 현재 스테이지의 게임의 상태가 done 아니면 putItem하지 않는다.
+        // 현재 스테이지의 게임의 상태가 done 아니면 putItem 하지 않는다.
         if (g === roundedNow && gameState !== 'done') {
           return null;
         }
@@ -38,6 +38,7 @@ app.get('*', async (req, res) => {
     await Promise.all(promises);
     results = await getGames(list);
   }
+  results.sort((a, b) => b.gameId > a.gameId ? 1 : -1);
   res.json({
     data: {
       results,
