@@ -5,8 +5,8 @@ export default class TimeChecker {
   endTimeStamp: any;
     constructor(ts) {
         this.startTimeStamp = ts;
-        this.animationStartTimeStamp = ts + 10000;
-        this.animationEndTimeStamp = ts + 50000;
+        this.animationStartTimeStamp = ts + 20000;
+        this.animationEndTimeStamp = ts + 40000;
         this.endTimeStamp = ts + 60000;
     }
 
