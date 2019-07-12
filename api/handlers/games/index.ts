@@ -7,7 +7,7 @@ function createNArray(n = 0) {
 }
 
 app.get('*', async (req, res) => {
-  const { nowS, roundedNow } = getRoundedNow();
+  const { nowS, nowTs, roundedNow } = getRoundedNow();
   const list = createNArray(100).reduce((acc, item) => {
     acc.arr[item] = (acc.roundedNow - (60000 * item));
     return acc;
@@ -43,7 +43,8 @@ app.get('*', async (req, res) => {
       results,
       gameState: {
         state: gameState,
-        ts: roundedNow,
+        gameId: roundedNow,
+        ts: nowTs,
       },
     },
   });
@@ -58,6 +59,7 @@ function getRoundedNow() {
   return {
     roundedNow,
     nowS,
+    nowTs,
   };
 }
 
