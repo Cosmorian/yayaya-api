@@ -5,8 +5,8 @@ export default function GameHistory({game}) {
   const { gameId, result } = game;
   return (
     <div className="GameHistory">
-      <div>
-        {moment(gameId).format()}
+      <div className="Date">
+        {moment(gameId).format('MM/DD/ hh:mm')}
       </div>
       <div>
         {result + 1}
@@ -14,6 +14,11 @@ export default function GameHistory({game}) {
       <style jsx>{`
         .GameHistory {
           position: relative;
+          display: flex;
+        }
+        .Date {
+          width: 100px;
+          text-align: center;
         }
       `}</style>
     </div>
