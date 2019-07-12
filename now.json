@@ -4,6 +4,10 @@
   "alias": [],
   "builds": [
     {
+      "src": "www/package.json",
+      "use": "@now/next"
+    },
+    {
       "src": "api/handlers/**/*.ts",
       "use": "@now/node"
     }
@@ -11,6 +15,16 @@
   "routes": [
     {
       "src": "/api/games", "dest": "/api/handlers/games/index.ts"
+    },
+    {
+      "src": "/api/now", "dest": "/api/handlers/now.ts"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/www/$1",
+      "headers": {
+        "x-request-path": "$1"
+      }
     }
   ]
 }
