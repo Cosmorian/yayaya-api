@@ -8,15 +8,23 @@ export async function getGames() {
   return axios.get('/api/games');
 }
 
+const store: any = {
+  count: 0,
+};
+
 function useGames() {
   const [gameState, setGameState] = useState(null);
   const [games, setGames] = useState([]);
   useEffect(() => {
-    getGames().then(response => {
-      const { results, gameState } = response.data.data;
-      setGames(results);
-      setGameState(gameState);
-    });
+    store.refresh = function() {
+      setGameState(null);
+      getGames().then(response => {
+        const { results, gameState } = response.data.data;
+        setGames(results);
+        setGameState(gameState);
+      });
+    };
+    store.refresh();
   }, []);
 
   useEffect(() => {
@@ -40,7 +48,7 @@ export default function IndexPage() {
 
         <div className="Game">
           {gameState ?
-            <Game startTime={gameState.ts} /> : null
+            <Game store={store} startTime={gameState.ts} /> : null
           }
         </div>
         <div className="GameHistoryPanel">

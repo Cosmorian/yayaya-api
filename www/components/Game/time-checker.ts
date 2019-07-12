@@ -24,4 +24,9 @@ export default class TimeChecker {
         const now = Date.now();
         return (this.endTimeStamp > now && this.animationEndTimeStamp < now);
     }
+
+    isOverTime() {
+      const now = Date.now();
+      return (this.endTimeStamp < now);
+    }
 }
