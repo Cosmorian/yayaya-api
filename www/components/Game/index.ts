@@ -10,7 +10,7 @@ export default class Yayaya {
   ball: any;
   absolutePositionValue: any;
   renderData: any;
-  timeChecker: any;
+  timeChecker: TimeChecker;
   canvas: any;
   ctx: any;
   yaImage: any;
@@ -77,7 +77,6 @@ export default class Yayaya {
       this.renderData.stopStartAnimation = window.requestAnimationFrame( tFrame => this.start(tFrame, step, position) );
       if (this.renderData.lastTick + this.renderData.tickLength <= tFrame && this.timeChecker.isAnimationTime()) {
           this.renderData.lastTick = tFrame;
-          this.renderData.tickCnt = this.renderData.tickCnt + 1;
           if (step === 1 && position.y > this.absolutePositionValue[0].y - 50) {
               position.y -= 2;
           } else if (step === 2 && position.y < this.absolutePositionValue[0].y) {
@@ -105,7 +104,6 @@ export default class Yayaya {
       this.renderData.stopStartAnimation = window.requestAnimationFrame( tFrame => this.end(tFrame, step, position) );
       if (this.renderData.lastTick + this.renderData.tickLength <= tFrame) {
           this.renderData.lastTick = tFrame;
-          this.renderData.tickCnt = this.renderData.tickCnt + 1;
           if (step === 1 && position.y > this.absolutePositionValue[0].y - 50) {
               position.y -= 2;
           } else if (step === 2 && this.timeChecker.isOverTime()) {
@@ -120,8 +118,8 @@ export default class Yayaya {
   }
 
   changePosition() {
-      if (this.renderData.velocity > 0.1) {
-          this.renderData.velocity -= 0.05;
+      if (this.renderData.velocity > 0.1 && this.timeChecker.isAnimationTime()) {
+          this.renderData.velocity = 2 - (0.05 * Math.round(((Date.now() - this.timeChecker.animationStartTimeStamp) / 50) / 8));
       }
 
       const shuffledArray = shuffleArray(this.yas.map(ya => ya.position));
@@ -168,7 +166,13 @@ export default class Yayaya {
        this.ballImage.onload = () => {
            this.initBallPosition(1);
            this.render(true);
-           this.start(performance.now(), 1, {x: 0, y: this.absolutePositionValue[0].y});
+           if (this.timeChecker.isReadyTime()) {
+             this.start(performance.now(), 1, {x: 0, y: this.absolutePositionValue[0].y});
+           } else if (this.timeChecker.isAnimationTime()) {
+             this.main(performance.now());
+           } else if (this.timeChecker.isResultTime()) {
+             this.end(performance.now(), 1, {x: 0, y: this.absolutePositionValue[0].y});
+           }
        };
 
        this.yaImage.src = '/static/images/cup.png';
