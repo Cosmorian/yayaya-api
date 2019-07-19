@@ -15,11 +15,49 @@ export default class Yayaya {
   ctx: any;
   yaImage: any;
   ballImage: any;
+  leftHandImage: any;
+  rightHandImage: any;
   store: any;
+  hands: {
+    left: {
+      x: number,
+      y: number,
+      imageInfo: {
+        width: number,
+        height: number,
+      }
+    },
+    right: {
+      x: number,
+      y: number,
+      imageInfo: {
+        width: number,
+        height: number,
+      }
+    }
+  };
   constructor(wrapper, ts, store) {
       this.wrapper = wrapper;
       this.yas = [];
       this.ball = {};
+      this.hands = {
+        left: {
+          x: 0,
+          y: 0,
+          imageInfo: {
+            width: 0,
+            height: 0
+          }
+        },
+        right: {
+          x: 0,
+          y: 0,
+          imageInfo: {
+            width: 0,
+            height: 0
+          }
+        }
+      };
       this.absolutePositionValue = [];
       this.renderData = {
           stopAnimation: {},
@@ -41,6 +79,7 @@ export default class Yayaya {
       this.wrapper.append(this.canvas);
       this.ctx = this.canvas.getContext('2d');
       this.initYa();
+      this.initHands();
   }
 
   async main(tFrame) {
@@ -178,12 +217,49 @@ export default class Yayaya {
        this.yaImage.src = '/static/images/cup.png';
    }
 
+   initHands() {
+    this.leftHandImage = new Image();
+    this.rightHandImage = new Image();
+     this.leftHandImage.onload = () => {
+       this.initLeftHandPosition();
+     };
+     this.rightHandImage.onload = () => {
+       this.initRightHandPosition();
+     };
+
+     this.leftHandImage.src = '/static/images/left-hand.png';
+     this.rightHandImage.src = '/static/images/right-hand.png';
+   }
+
+  initLeftHandPosition() {
+    const imageWidth = this.canvas.width / 3;
+    const imageHeight = imageWidth * (this.leftHandImage.height / this.leftHandImage.width);
+    this.hands.left.x = 0 - (imageWidth / 3);
+    this.hands.left.y = this.canvas.height - (this.canvas.height / 2);
+    this.hands.left.imageInfo = {
+      width: imageWidth,
+      height: imageHeight
+    }
+  }
+
+  initRightHandPosition() {
+    const imageWidth = this.canvas.width / 3;
+    const imageHeight = imageWidth * (this.rightHandImage.height / this.rightHandImage.width);
+    this.hands.right.x = this.canvas.width - (imageWidth - (imageWidth / 3));
+    this.hands.right.y = this.canvas.height - (this.canvas.height / 2);
+    this.hands.right.imageInfo = {
+      width: imageWidth,
+      height: imageHeight
+    }
+  }
+
   render(withBall) {
       this.ctx.clearRect(0,0, this.canvas.width, this.canvas.height);
       if (withBall) {
           this.drawBall();
       }
       this.drawYa();
+      this.drawHands();
   }
 
   drawYa() {
@@ -198,6 +274,15 @@ export default class Yayaya {
       this.ctx.beginPath();
       this.ctx.drawImage(this.ballImage, this.ball.x, this.ball.y, this.ball.imageInfo.width, this.ball.imageInfo.height);
       this.ctx.closePath();
+  }
+
+  drawHands() {
+    this.ctx.beginPath();
+    this.ctx.drawImage(this.leftHandImage, this.hands.left.x, this.hands.left.y, this.hands.left.imageInfo.width, this.hands.left.imageInfo.height);
+    this.ctx.drawImage(this.rightHandImage, this.hands.right.x, this.hands.right.y, this.hands.right.imageInfo.width, this.hands.right.imageInfo.height);
+    this.ctx.closePath();
+    // this.ctx.beginPath();
+    // this.ctx.closePath();
   }
 
   setBallPosition(position) {

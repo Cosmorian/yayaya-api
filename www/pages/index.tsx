@@ -35,7 +35,6 @@ function useGames() {
   }, []);
   return {games, gameState};
 }
-
 export default function IndexPage() {
   const {games, gameState} = useGames();
   return (
