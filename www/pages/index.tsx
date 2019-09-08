@@ -47,7 +47,7 @@ export default function IndexPage() {
 
         <div className="Game">
           {gameState ?
-            <Game store={store} startTime={gameState.ts} /> : null
+            <Game store={store} startTime={gameState.gameId} /> : null
           }
         </div>
         <div className="GameHistoryPanel">

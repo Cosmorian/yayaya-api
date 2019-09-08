@@ -3,6 +3,7 @@ import Ya from './ya';
 import Ball from './ball';
 import TimeChecker from './time-checker';
 import {getGames} from "../../pages";
+import Hand from "./hand";
 
 export default class Yayaya {
   wrapper: any;
@@ -13,50 +14,24 @@ export default class Yayaya {
   timeChecker: TimeChecker;
   canvas: any;
   ctx: any;
-  yaImage: any;
-  ballImage: any;
-  leftHandImage: any;
-  rightHandImage: any;
   store: any;
   hands: {
-    left: {
-      x: number,
-      y: number,
-      imageInfo: {
-        width: number,
-        height: number,
-      }
-    },
-    right: {
-      x: number,
-      y: number,
-      imageInfo: {
-        width: number,
-        height: number,
-      }
-    }
+    left: Hand,
+    right: Hand
   };
   constructor(wrapper, ts, store) {
       this.wrapper = wrapper;
       this.yas = [];
       this.ball = {};
       this.hands = {
-        left: {
-          x: 0,
-          y: 0,
-          imageInfo: {
-            width: 0,
-            height: 0
-          }
-        },
-        right: {
-          x: 0,
-          y: 0,
-          imageInfo: {
-            width: 0,
-            height: 0
-          }
-        }
+        left: new Hand('left', 0, 0, {
+          width: 0,
+          height: 0
+        }),
+        right: new Hand('right', 0, 0, {
+          width: 0,
+          height: 0
+        })
       };
       this.absolutePositionValue = [];
       this.renderData = {
@@ -85,6 +60,7 @@ export default class Yayaya {
   async main(tFrame) {
       this.renderData.stopAnimation = window.requestAnimationFrame( tFrame => this.main(tFrame) );
       if (this.renderData.lastTick + this.renderData.tickLength <= tFrame) {
+          this.moveHands();
           this.renderData.lastTick = tFrame;
           this.renderData.tickCnt = this.renderData.tickCnt + 1;
           if (this.checkEndedMoving() || !this.yas.some(ya => ya.isMoving)) {
@@ -193,17 +169,35 @@ export default class Yayaya {
       this.render(false);
   }
 
+  moveHands() {
+    this.hands.left.changeMoveDirection();
+    this.hands.right.changeMoveDirection();
+    const velocity = 30 - this.renderData.velocity * 15;
+
+    if (this.hands.left.moveDirection === 'right') {
+      this.hands.left.x = this.hands.left.x + (1 + velocity);
+    } else {
+      this.hands.left.x = this.hands.left.x - (1 + velocity);
+    }
+
+    if (this.hands.right.moveDirection === 'right') {
+      this.hands.right.x = this.hands.right.x + (1 + velocity);
+    } else {
+      this.hands.right.x = this.hands.right.x - (1 + velocity);
+    }
+  }
+
    initYa() {
-       this.yaImage = new Image();
-       this.ballImage = new Image();
-       this.yaImage.onload = () => {
-           this.initYaPosition();
+       const yaImage = new Image();
+       const ballImage = new Image();
+       yaImage.onload = () => {
+           this.initYaPosition(yaImage);
            this.changePosition();
-           this.ballImage.src = '/static/images/ball.png';
+           ballImage.src = '/static/images/ball.png';
        };
 
-       this.ballImage.onload = () => {
-           this.initBallPosition(1);
+       ballImage.onload = () => {
+           this.initBallPosition(1, ballImage);
            this.render(true);
            if (this.timeChecker.isReadyTime()) {
              this.start(performance.now(), 1, {x: 0, y: this.absolutePositionValue[0].y});
@@ -214,28 +208,34 @@ export default class Yayaya {
            }
        };
 
-       this.yaImage.src = '/static/images/cup.png';
+       yaImage.src = '/static/images/cup.png';
    }
 
    initHands() {
-    this.leftHandImage = new Image();
-    this.rightHandImage = new Image();
-     this.leftHandImage.onload = () => {
-       this.initLeftHandPosition();
-     };
-     this.rightHandImage.onload = () => {
-       this.initRightHandPosition();
-     };
+    const leftHandImage = new Image();
+    this.hands.left.image = leftHandImage;
+    this.hands.left.moveDirection = 'right';
+    const rightHandImage = new Image();
+    this.hands.right.image = rightHandImage;
+    this.hands.right.moveDirection = 'left';
+    leftHandImage.onload = () => {
+      this.initLeftHandPosition();
+    };
+    rightHandImage.onload = () => {
+      this.initRightHandPosition();
+    };
 
-     this.leftHandImage.src = '/static/images/left-hand.png';
-     this.rightHandImage.src = '/static/images/right-hand.png';
+    leftHandImage.src = '/static/images/left-hand.png';
+    rightHandImage.src = '/static/images/right-hand.png';
    }
 
   initLeftHandPosition() {
     const imageWidth = this.canvas.width / 3;
-    const imageHeight = imageWidth * (this.leftHandImage.height / this.leftHandImage.width);
+    const imageHeight = imageWidth * (this.hands.left.image.height / this.hands.left.image.width);
     this.hands.left.x = 0 - (imageWidth / 3);
     this.hands.left.y = this.canvas.height - (this.canvas.height / 2);
+    this.hands.left.startX = this.hands.left.x;
+    this.hands.left.startY = this.hands.left.y;
     this.hands.left.imageInfo = {
       width: imageWidth,
       height: imageHeight
@@ -244,9 +244,11 @@ export default class Yayaya {
 
   initRightHandPosition() {
     const imageWidth = this.canvas.width / 3;
-    const imageHeight = imageWidth * (this.rightHandImage.height / this.rightHandImage.width);
+    const imageHeight = imageWidth * (this.hands.right.image.height / this.hands.right.image.width);
     this.hands.right.x = this.canvas.width - (imageWidth - (imageWidth / 3));
     this.hands.right.y = this.canvas.height - (this.canvas.height / 2);
+    this.hands.right.startX = this.hands.right.x;
+    this.hands.right.startY = this.hands.right.y;
     this.hands.right.imageInfo = {
       width: imageWidth,
       height: imageHeight
@@ -265,60 +267,61 @@ export default class Yayaya {
   drawYa() {
       this.yas.forEach(ya => {
           this.ctx.beginPath();
-          this.ctx.drawImage(this.yaImage, ya.x, ya.y, ya.imageInfo.width, ya.imageInfo.height);
+          this.ctx.drawImage(ya.image, ya.x, ya.y, ya.imageInfo.width, ya.imageInfo.height);
           this.ctx.closePath();
       })
   }
 
   drawBall() {
       this.ctx.beginPath();
-      this.ctx.drawImage(this.ballImage, this.ball.x, this.ball.y, this.ball.imageInfo.width, this.ball.imageInfo.height);
+      this.ctx.drawImage(this.ball.image, this.ball.x, this.ball.y, this.ball.imageInfo.width, this.ball.imageInfo.height);
       this.ctx.closePath();
   }
 
   drawHands() {
     this.ctx.beginPath();
-    this.ctx.drawImage(this.leftHandImage, this.hands.left.x, this.hands.left.y, this.hands.left.imageInfo.width, this.hands.left.imageInfo.height);
-    this.ctx.drawImage(this.rightHandImage, this.hands.right.x, this.hands.right.y, this.hands.right.imageInfo.width, this.hands.right.imageInfo.height);
+    this.ctx.drawImage(this.hands.left.image, this.hands.left.x, this.hands.left.y, this.hands.left.imageInfo.width, this.hands.left.imageInfo.height);
+    this.ctx.drawImage(this.hands.right.image, this.hands.right.x, this.hands.right.y, this.hands.right.imageInfo.width, this.hands.right.imageInfo.height);
     this.ctx.closePath();
-    // this.ctx.beginPath();
-    // this.ctx.closePath();
   }
 
   setBallPosition(position) {
     const ya = this.yas.find(ya => ya.position === position + 1);
     const imageWidth = this.canvas.width / 10;
-    const imageHeight = imageWidth * (this.ballImage.height / this.ballImage.width);
+    const imageHeight = imageWidth * (this.ball.image.height / this.ball.image.width);
     const x = (ya.x + (ya.imageInfo.width / 2)) - (imageWidth / 2);
     const y = ya.y + ya.imageInfo.height - imageHeight;
     this.ball.x = x;
     this.ball.y = y;
   }
 
-  initBallPosition(position) {
+  initBallPosition(position, ballImage) {
       const ya = this.yas[position];
       const imageWidth = this.canvas.width / 10;
-      const imageHeight = imageWidth * (this.ballImage.height / this.ballImage.width);
+      const imageHeight = imageWidth * (ballImage.height / ballImage.width);
       const x = (ya.x + (ya.imageInfo.width / 2)) - (imageWidth / 2);
       const y = ya.y + ya.imageInfo.height - imageHeight;
       this.ball = new Ball(x, y, {
           width: imageWidth,
           height: imageHeight
       });
+      this.ball.image = ballImage;
   }
 
-  initYaPosition() {
+  initYaPosition(yaImage) {
       const imageWidth = this.canvas.width / 4;
-      const imageHeight = imageWidth * (this.yaImage.height / this.yaImage.width);
+      const imageHeight = imageWidth * (yaImage.height / yaImage.width);
       const eachArea = this.canvas.width / 3;
       const leftSpace = (eachArea - this.canvas.width / 4) / 2;
       [1, 2, 3].forEach((position, index) => {
           const x = eachArea * index + leftSpace;
           const y = (this.canvas.width / 2) - imageHeight / 2;
-          this.yas.push(new Ya(position, x, y, {
-              width: imageWidth,
-              height: imageHeight
-          }));
+          const ya = new Ya(position, x, y, {
+            width: imageWidth,
+            height: imageHeight
+          });
+          ya.image = yaImage;
+          this.yas.push(ya);
           this.absolutePositionValue.push({x, y});
       });
   }

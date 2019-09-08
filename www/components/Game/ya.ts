@@ -1,4 +1,5 @@
 export default class Ya {
+  image: HTMLImageElement;
   name: any;
   x: any;
   y: any;
