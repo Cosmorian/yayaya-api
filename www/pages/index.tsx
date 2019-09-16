@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import moment from 'moment';
+// import moment from 'moment';
 import axios from 'axios';
 import Game from "../components/Game/Game";
 import GameHistory from "../components/GameHistory/GameHistory";
@@ -38,12 +38,12 @@ function useGames() {
 export default function IndexPage() {
   const {games, gameState} = useGames();
   return (
-    <div>
-      <h1>
-        {gameState ?
-          moment(gameState.gameId).format('MM/DD/ hh:mm') : null}
-      </h1>
-      <div className="wrapper">
+    <div className="wrapper">
+      {/*<h1>*/}
+      {/*  {gameState ?*/}
+      {/*    moment(gameState.gameId).format('MM/DD/ hh:mm') : null}*/}
+      {/*</h1>*/}
+      <div className="game-wrapper">
 
         <div className="Game">
           {gameState ?
@@ -56,7 +56,15 @@ export default function IndexPage() {
       </div>
       <style jsx>{`
         .wrapper {
+          width: 900px;
+          padding: 40px;
+          background-image: url('/static/images/background.png');
+        }
+        .game-wrapper {
           display: flex;
+          background-image: url('/static/images/frame.png');
+          background-repeat: no-repeat;
+          background-size: contain;
         }
         .Game {
           width: 500px;
