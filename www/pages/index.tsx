@@ -56,24 +56,29 @@ export default function IndexPage() {
       </div>
       <style jsx>{`
         .wrapper {
+          display: flex;
+          justify-content: center;
           width: 900px;
-          padding: 40px;
+          height: 600px;
           background-image: url('/static/images/background.png');
+          
         }
         .game-wrapper {
+          top: 127px;
+          position: absolute;
+          margin: auto;
           display: flex;
           background-image: url('/static/images/frame.png');
           background-repeat: no-repeat;
           background-size: contain;
         }
         .Game {
-          width: 500px;
-          height: 500px;
-          margin-right: 24px;
+          width: 640px;
+          height: 445px;
         }
         .GameHistoryPanel {
-          height: 500px;
-          width: 200px;
+          height: 445px;
+          width: 210px;
           overflow: auto;
           border: 1px solid black;
         }

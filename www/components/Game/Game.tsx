@@ -11,7 +11,7 @@ export default function Game({ store, startTime }) {
     <div className="wrapper" ref={wrapper}>
       <style jsx>{`
         .wrapper {
-          width: 500px;
+          width: 100%;
           height: 500px;
           border: 1px solid black;
         }
