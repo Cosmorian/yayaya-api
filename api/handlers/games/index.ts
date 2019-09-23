@@ -1,25 +1,21 @@
-import { getApp } from "../../app"
+import {getApp} from "../../app"
 import DynamoEntity from "../../entity/DynamoEntity"
+import Range from "../../shared/Range";
+import Time from "../../shared/Time";
+import GameState from "../../shared/GameState";
+import RemoteGames from "../../remote/RemoteGames";
+
 const app = getApp();
 
-function createNArray(n = 0) {
-  return [...Array(n).keys()];
-}
-
 app.get('*', async (req, res) => {
-  const { nowS, nowTs, roundedNow } = getRoundedNow();
-  const list = createNArray(100).reduce((acc, item) => {
+  const { nowS, nowTs, roundedNow } = Time.getRoundedNow();
+  const { arr: list } = Range.create(100).reduce((acc, item) => {
     acc.arr[item] = (acc.roundedNow - (60000 * item));
     return acc;
-  }, {
-    arr: [],
-    roundedNow,
-  }).arr.reverse();
-  let gameState = 'ready';
-  if (nowS >= 20000) {
-    gameState = nowS < 40000 ? 'onprogress' : 'done';
-  }
-  let results = await getGames(list);
+  }, { arr: [], roundedNow });
+  list.reverse();
+  const gameState = new GameState(nowS);
+  let results = await RemoteGames.getGames(list);
   const existsIds = results
     .map(ya => (ya && ya.gameId))
     .filter(i => i);
@@ -27,7 +23,7 @@ app.get('*', async (req, res) => {
     .map(g => {
       if (existsIds.indexOf(g) === -1) {
         // 현재 스테이지의 게임의 상태가 done 아니면 putItem 하지 않는다.
-        if (g === roundedNow && gameState !== 'done') {
+        if (g === roundedNow && gameState.isDone()) {
           return null;
         }
         return DynamoEntity.putItem(g);
@@ -36,7 +32,7 @@ app.get('*', async (req, res) => {
     .filter(r => r);
   if (promises.length) {
     await Promise.all(promises);
-    results = await getGames(list);
+    results = await RemoteGames.getGames(list);
   }
   results.sort((a, b) => b.gameId > a.gameId ? 1 : -1);
   res.json({
@@ -50,23 +46,5 @@ app.get('*', async (req, res) => {
     },
   });
 });
-
-function getRoundedNow() {
-  const now = new Date();
-  const nowTs = now.valueOf();
-  const nowMs = now.getUTCMilliseconds();
-  const nowS = now.getUTCSeconds() * 1000;
-  const roundedNow = nowTs - nowMs - nowS;
-  return {
-    roundedNow,
-    nowS,
-    nowTs,
-  };
-}
-
-async function getGames(games: number[]) {
-  const { Responses: { yayaya = [] } } = await DynamoEntity.queryIds(games);
-  return yayaya;
-}
 
 export default app;
