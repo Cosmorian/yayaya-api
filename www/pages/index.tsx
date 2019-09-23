@@ -73,7 +73,7 @@ export default function IndexPage() {
           background-size: contain;
         }
         .Game {
-          width: 640px;
+          width: 622px;
           height: 445px;
         }
         .GameHistoryPanel {
