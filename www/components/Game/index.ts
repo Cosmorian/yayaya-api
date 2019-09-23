@@ -287,8 +287,8 @@ export default class Yayaya {
 
   setBallPosition(position) {
     const ya = this.yas.find(ya => ya.position === position + 1);
-    const imageWidth = this.canvas.width / 10;
-    const imageHeight = imageWidth * (this.ball.image.height / this.ball.image.width);
+    const imageWidth = this.ball.imageInfo.width;
+    const imageHeight = this.ball.imageInfo.height;
     const x = (ya.x + (ya.imageInfo.width / 2)) - (imageWidth / 2);
     const y = ya.y + ya.imageInfo.height - imageHeight;
     this.ball.x = x;
@@ -297,7 +297,8 @@ export default class Yayaya {
 
   initBallPosition(position, ballImage) {
       const ya = this.yas[position];
-      const imageWidth = this.canvas.width / 10;
+      // const imageWidth = this.canvas.width / 10;
+      const imageWidth = 45;
       const imageHeight = imageWidth * (ballImage.height / ballImage.width);
       const x = (ya.x + (ya.imageInfo.width / 2)) - (imageWidth / 2);
       const y = ya.y + ya.imageInfo.height - imageHeight;
@@ -309,10 +310,13 @@ export default class Yayaya {
   }
 
   initYaPosition(yaImage) {
-      const imageWidth = this.canvas.width / 4;
+      // const imageWidth = this.canvas.width / 4;
+      const imageWidth = 83;
       const imageHeight = imageWidth * (yaImage.height / yaImage.width);
-      const eachArea = this.canvas.width / 3;
-      const leftSpace = (eachArea - this.canvas.width / 4) / 2;
+      // const eachArea = this.canvas.width / 3;
+      const eachArea = 400 / 3;
+      // const leftSpace = (eachArea - this.canvas.width / 4) / 2;
+      const leftSpace = 135;
       [1, 2, 3].forEach((position, index) => {
           const x = eachArea * index + leftSpace;
           const y = (this.canvas.width / 2) - imageHeight / 2;
