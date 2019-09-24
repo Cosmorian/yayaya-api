@@ -230,10 +230,13 @@ export default class Yayaya {
    }
 
   initLeftHandPosition() {
-    const imageWidth = this.canvas.width / 3;
+    // const imageWidth = this.canvas.width / 3;
+    const imageWidth = 80;
     const imageHeight = imageWidth * (this.hands.left.image.height / this.hands.left.image.width);
-    this.hands.left.x = 0 - (imageWidth / 3);
-    this.hands.left.y = this.canvas.height - (this.canvas.height / 2);
+    // this.hands.left.x = 0 - (imageWidth / 3);
+    this.hands.left.x = 150;
+    // this.hands.left.y = this.canvas.height - (this.canvas.height / 2);
+    this.hands.left.y = 175;
     this.hands.left.startX = this.hands.left.x;
     this.hands.left.startY = this.hands.left.y;
     this.hands.left.imageInfo = {
@@ -243,10 +246,13 @@ export default class Yayaya {
   }
 
   initRightHandPosition() {
-    const imageWidth = this.canvas.width / 3;
+    // const imageWidth = this.canvas.width / 3;
+    const imageWidth = 80;
     const imageHeight = imageWidth * (this.hands.right.image.height / this.hands.right.image.width);
-    this.hands.right.x = this.canvas.width - (imageWidth - (imageWidth / 3));
-    this.hands.right.y = this.canvas.height - (this.canvas.height / 2);
+    // this.hands.right.x = this.canvas.width - (imageWidth - (imageWidth / 3));
+    this.hands.right.x = 395;
+    // this.hands.right.y = this.canvas.height - (this.canvas.height / 2);
+    this.hands.right.y = 175;
     this.hands.right.startX = this.hands.right.x;
     this.hands.right.startY = this.hands.right.y;
     this.hands.right.imageInfo = {
@@ -319,7 +325,9 @@ export default class Yayaya {
       const leftSpace = 135;
       [1, 2, 3].forEach((position, index) => {
           const x = eachArea * index + leftSpace;
-          const y = (this.canvas.width / 2) - imageHeight / 2;
+          // const y = (this.canvas.width / 2) - imageHeight / 2;
+          // const y = 270;
+          const y = 270 - imageHeight;
           const ya = new Ya(position, x, y, {
             width: imageWidth,
             height: imageHeight
