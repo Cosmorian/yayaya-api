@@ -128,6 +128,8 @@ export default class Yayaya {
           this.yas.forEach(ya => {
               ya.y = position.y;
           });
+          this.hands.left.degree = 0;
+          this.hands.right.degree = 0;
           this.render(true);
       }
   }
@@ -175,16 +177,18 @@ export default class Yayaya {
     const velocity = 30 - this.renderData.velocity * 15;
 
     if (this.hands.left.moveDirection === 'right') {
-      this.hands.left.x = this.hands.left.x + (1 + velocity);
+      this.hands.left.degree = this.hands.left.degree - (1 + velocity);
     } else {
-      this.hands.left.x = this.hands.left.x - (1 + velocity);
+      this.hands.left.degree = this.hands.left.degree + (1 + velocity);
     }
 
     if (this.hands.right.moveDirection === 'right') {
-      this.hands.right.x = this.hands.right.x + (1 + velocity);
+      this.hands.right.degree = this.hands.right.degree - (1 + velocity);
     } else {
-      this.hands.right.x = this.hands.right.x - (1 + velocity);
+      this.hands.right.degree = this.hands.right.degree + (1 + velocity);
     }
+    console.log(this.hands.left.moveDirection);
+    console.log(this.hands.left.degree);
   }
 
    initYa() {
@@ -266,8 +270,8 @@ export default class Yayaya {
       if (withBall) {
           this.drawBall();
       }
-      this.drawYa();
       this.drawHands();
+      this.drawYa();
   }
 
   drawYa() {
@@ -286,8 +290,20 @@ export default class Yayaya {
 
   drawHands() {
     this.ctx.beginPath();
-    this.ctx.drawImage(this.hands.left.image, this.hands.left.x, this.hands.left.y, this.hands.left.imageInfo.width, this.hands.left.imageInfo.height);
-    this.ctx.drawImage(this.hands.right.image, this.hands.right.x, this.hands.right.y, this.hands.right.imageInfo.width, this.hands.right.imageInfo.height);
+    // left hand
+    this.ctx.save();
+    this.ctx.translate(this.hands.left.x + this.hands.left.imageInfo.width, this.hands.left.y);
+    this.ctx.rotate(this.hands.left.degree * Math.PI / 180);
+    // debugger;
+    // this.ctx.drawImage(this.hands.left.image, this.hands.left.x, this.hands.left.y, this.hands.left.imageInfo.width, this.hands.left.imageInfo.height);
+    this.ctx.drawImage(this.hands.left.image, 0, 0, this.hands.left.imageInfo.width * -1, this.hands.left.imageInfo.height);
+    this.ctx.restore();
+    // right hand
+    this.ctx.save();
+    this.ctx.translate(this.hands.right.x, this.hands.right.y);
+    this.ctx.rotate(this.hands.right.degree * Math.PI / 180);
+    this.ctx.drawImage(this.hands.right.image, 0, 0, this.hands.right.imageInfo.width, this.hands.right.imageInfo.height);
+    this.ctx.restore();
     this.ctx.closePath();
   }
 
