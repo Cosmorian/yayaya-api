@@ -1,6 +1,7 @@
 export default class Hand {
   direction: string;
   moveDirection: string;
+  degree: number;
   startX: number;
   startY: number;
   x: number;
@@ -18,19 +19,20 @@ export default class Hand {
       width: imageInfo.width,
       height: imageInfo.height
     }
+    this.degree = 0;
   }
 
   changeMoveDirection() {
-    if (this.direction === 'left' && this.moveDirection === 'right' && this.startX + 35 <= this.x) {
+    if (this.direction === 'left' && this.moveDirection === 'right' && this.degree <= -20) {
       this.moveDirection = 'left';
-    } else if (this.direction === 'left' && this.moveDirection === 'left' && this.startX >= this.x) (
+    } else if (this.direction === 'left' && this.moveDirection === 'left' && this.degree >= 0) (
       this.moveDirection = 'right'
     )
 
-    if (this.direction === 'right' && this.moveDirection === 'right' && this.startX <= this.x) {
-      this.moveDirection = 'left';
-    } else if (this.direction === 'right' && this.moveDirection === 'left' && this.startX - 35 >= this.x) {
+    if (this.direction === 'right' && this.moveDirection === 'left' && this.degree >= 20) {
       this.moveDirection = 'right';
+    } else if (this.direction === 'right' && this.moveDirection === 'right' && this.degree <= 0) {
+      this.moveDirection = 'left';
     }
   }
 }
