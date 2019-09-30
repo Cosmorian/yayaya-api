@@ -11,7 +11,7 @@ export default class GameResult {
     this.gameIdList = this.createList(roundedNow);
   }
 
-  getResult() {
+  get() {
     return this.result;
   }
 

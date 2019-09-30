@@ -19,9 +19,9 @@ export default class Time {
     const roundedUTCToday = ts - (now.getUTCHours() * 60 * 60 * 1000) - (now.getUTCMinutes() * 60 * 1000) - (now.getUTCSeconds() * 1000) - now.getUTCMilliseconds();
     if (now.getUTCHours() + timeOffset > 23) {
       const day = 24 * 60 * 60 * 1000
-      return roundedUTCToday + day + (timeOffset * 60 * 60 * 1000);
+      return roundedUTCToday + day - (timeOffset * 60 * 60 * 1000);
     } else {
-      return roundedUTCToday + (timeOffset * 60 * 60 * 1000);
+      return roundedUTCToday - (timeOffset * 60 * 60 * 1000);
     }
   }
 }

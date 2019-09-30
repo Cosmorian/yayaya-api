@@ -10,13 +10,15 @@ const app = getApp();
 
 app.get('*', async (req, res) => {
   const { nowS, nowTs, roundedNow } = Time.getRoundedNow();
+  const roundedToday = Time.getToday();
   const gameResult = new GameResult(roundedNow);
   const gameState = new GameState(nowS);
-  const roundedToday = Time.getToday();
+  const order = Math.floor((nowTs - roundedToday) / (60 * 1000));
   await gameResult.createGameResultList(gameState);
   res.json({
     data: {
-      results: gameResult.getResult(),
+      order,
+      results: gameResult.get(),
       gameState: {
         state: gameState,
         gameId: roundedNow,
