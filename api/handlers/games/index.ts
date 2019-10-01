@@ -17,7 +17,7 @@ app.get('*', async (req, res) => {
   await gameResult.createGameResultList(gameState);
   res.json({
     data: {
-      order,
+      start: roundedToday,
       results: gameResult.get(),
       gameState: {
         state: gameState,

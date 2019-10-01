@@ -187,8 +187,6 @@ export default class Yayaya {
     } else {
       this.hands.right.degree = this.hands.right.degree + (1 + velocity);
     }
-    console.log(this.hands.left.moveDirection);
-    console.log(this.hands.left.degree);
   }
 
    initYa() {

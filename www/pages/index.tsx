@@ -15,28 +15,23 @@ const store: any = {
 function useGames() {
   const [gameState, setGameState] = useState(null);
   const [games, setGames] = useState([]);
+  const [start, setStart] = useState(null);
   useEffect(() => {
     store.refresh = function() {
       setGameState(null);
       getGames().then(response => {
-        const { results, gameState } = response.data.data;
+        const { results, gameState, start } = response.data.data;
         setGames(results);
         setGameState(gameState);
+        setStart(start);
       });
     };
     store.refresh();
   }, []);
-
-  useEffect(() => {
-    // const interval = setInterval(async () => {
-    //   const response = await getGames();
-    // }, 10000);
-    // return () => clearInterval(interval);
-  }, []);
-  return {games, gameState};
+  return { games, gameState, start };
 }
 export default function IndexPage() {
-  const {games, gameState} = useGames();
+  const { start, games, gameState } = useGames();
   return (
     <div className="wrapper">
       {/*<h1>*/}
@@ -44,14 +39,13 @@ export default function IndexPage() {
       {/*    moment(gameState.gameId).format('MM/DD/ hh:mm') : null}*/}
       {/*</h1>*/}
       <div className="game-wrapper">
-
         <div className="Game">
           {gameState ?
             <Game store={store} startTime={gameState.gameId} /> : null
           }
         </div>
         <div className="GameHistoryPanel">
-          {games.map((game) => <GameHistory key={game.gameId} game={game}/>)}
+          {games.map((game) => <GameHistory key={game.gameId} start={start} game={game}/>)}
         </div>
       </div>
       <style jsx>{`
