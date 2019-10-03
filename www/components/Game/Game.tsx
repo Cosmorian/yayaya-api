@@ -13,7 +13,6 @@ export default function Game({ store, startTime }) {
         .wrapper {
           width: 100%;
           height: 500px;
-          border: 1px solid black;
         }
       `}</style>
     </div>

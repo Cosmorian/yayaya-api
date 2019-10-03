@@ -3,6 +3,7 @@ import React, {useEffect, useState} from 'react';
 import axios from 'axios';
 import Game from "../components/Game/Game";
 import GameHistory from "../components/GameHistory/GameHistory";
+import Head from "next/head";
 
 export async function getGames() {
   return axios.get('/api/games');
@@ -34,10 +35,9 @@ export default function IndexPage() {
   const { start, games, gameState } = useGames();
   return (
     <div className="wrapper">
-      {/*<h1>*/}
-      {/*  {gameState ?*/}
-      {/*    moment(gameState.gameId).format('MM/DD/ hh:mm') : null}*/}
-      {/*</h1>*/}
+      <Head>
+        <link href="https://fonts.googleapis.com/css?family=Do+Hyeon&display=swap" rel="stylesheet"/>
+      </Head>
       <div className="game-wrapper">
         <div className="Game">
           {gameState ?
@@ -45,7 +45,10 @@ export default function IndexPage() {
           }
         </div>
         <div className="GameHistoryPanel">
-          {games.map((game) => <GameHistory key={game.gameId} start={start} game={game}/>)}
+          <h2 className="HistoryTitle"> 지난회차 </h2>
+          <div>
+            {games.map((game) => <GameHistory key={game.gameId} start={start} game={game}/>)}
+          </div>
         </div>
       </div>
       <style jsx>{`
@@ -55,7 +58,6 @@ export default function IndexPage() {
           width: 900px;
           height: 600px;
           background-image: url('/static/images/background.png');
-          
         }
         .game-wrapper {
           top: 127px;
@@ -71,10 +73,22 @@ export default function IndexPage() {
           height: 445px;
         }
         .GameHistoryPanel {
-          height: 445px;
+          height: 438px;
           width: 210px;
           overflow: auto;
-          border: 1px solid black;
+        }
+        .HistoryTitle {
+          margin: 0;
+          padding: 12px 0;
+          font-size: 30px;
+          letter-spacing: 6px;
+          color: white;
+          text-align: center;
+        }
+      `}</style>
+      <style jsx global>{`
+        body {
+          font-family: 'Do Hyeon', sans-serif;
         }
       `}</style>
     </div>
