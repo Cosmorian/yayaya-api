@@ -38,6 +38,7 @@ export default function IndexPage() {
       <Head>
         <link href="https://fonts.googleapis.com/css?family=Do+Hyeon&display=swap" rel="stylesheet"/>
       </Head>
+      <div className="game-title">야바위 게임</div>
       <div className="game-wrapper">
         <div className="Game">
           {gameState ?
@@ -58,6 +59,14 @@ export default function IndexPage() {
           width: 900px;
           height: 600px;
           background-image: url('/static/images/background.png');
+        }
+        .game-title {
+          margin-top: 20px;
+          width: 320px;
+          height: 70px;
+          font-size: 75px;
+          color: red;
+          animation: neon 1.5s ease-out infinite alternate;
         }
         .game-wrapper {
           top: 127px;
@@ -84,6 +93,41 @@ export default function IndexPage() {
           letter-spacing: 6px;
           color: white;
           text-align: center;
+        }
+        
+        @keyframes neon {
+          0% {
+            color: red;
+            text-shadow: 0 0 5px #fff, 0 0 7px #FF1177, 0 0 10px #FF1177, 0 0 12px #FF1177;
+          }
+          10% {
+            color: #f9cabd;
+            text-shadow: 0 0 5px #fff, 0 0 7px #FF1177, 0 0 10px #FF1177, 0 0 12px #FF1177;
+          }
+          15% {
+            color: red;
+            text-shadow: 0 0 5px #fff, 0 0 7px #FF1177, 0 0 10px #FF1177, 0 0 12px #FF1177;
+          }
+          70% {
+            color: #f9cabd;
+            text-shadow: 0 0 5px #fff, 0 0 7px #FF1177, 0 0 10px #FF1177, 0 0 12px #FF1177;
+          }
+          75% {
+            color: red;
+            text-shadow: 0 0 5px #fff, 0 0 7px #FF1177, 0 0 10px #FF1177, 0 0 12px #FF1177;
+          }
+          80% {
+            color: #f9cabd;
+            text-shadow: 0 0 5px #fff, 0 0 7px #FF1177, 0 0 10px #FF1177, 0 0 12px #FF1177;
+          }
+          85% {
+            color: red;
+            text-shadow: 0 0 5px #fff, 0 0 7px #FF1177, 0 0 10px #FF1177, 0 0 12px #FF1177;
+          }
+          100% {
+            color: #f9cabd;
+            text-shadow: 0 0 10px #fff, 0 0 12px #FF1177, 0 0 15px #FF1177, 0 0 17px #FF1177;
+          }
         }
       `}</style>
       <style jsx global>{`
