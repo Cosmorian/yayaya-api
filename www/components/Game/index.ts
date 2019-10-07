@@ -174,7 +174,7 @@ export default class Yayaya {
   moveHands() {
     this.hands.left.changeMoveDirection();
     this.hands.right.changeMoveDirection();
-    const velocity = 30 - this.renderData.velocity * 15;
+    const velocity = 20 / (this.renderData.velocity * 16);
 
     if (this.hands.left.moveDirection === 'right') {
       this.hands.left.degree = this.hands.left.degree - (1 + velocity);
