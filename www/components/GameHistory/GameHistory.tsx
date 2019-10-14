@@ -10,7 +10,7 @@ export default function GameHistory({ start, game }) {
       </div>
       <div className="Result">
         {arr.map((i) =>
-          <img src={`/static/images/cup${i === result ? '-with-stone' : ''}.png`} alt="cup"/>)}
+          <img key={i} src={`/static/images/cup${i === result ? '-with-stone' : ''}.png`} alt="cup"/>)}
       </div>
       <style jsx>{`
         .GameHistory {
