@@ -22,9 +22,13 @@ export default class GameResult {
       .filter(i => i);
     const promises = this.gameIdList
       .filter(g => existsIds.indexOf(g) === -1)
-      // 현재 스테이지의 게임의 상태가 done 아니면 putItem 하지 않는다.
-      .filter(g => g === this.roundedNow && gameState.isDone())
-      .map(g => DynamoEntity.putItem(g));
+      .map(g => {
+        // 현재 스테이지의 게임의 상태가 done 아니면 putItem 하지 않는다.
+        if (g === this.roundedNow && gameState.isDone()) {
+          return null
+        }
+        return DynamoEntity.putItem(g);
+      });
     if (promises.length) {
       await Promise.all(promises);
       this.result = await RemoteGames.getGames(this.gameIdList);
