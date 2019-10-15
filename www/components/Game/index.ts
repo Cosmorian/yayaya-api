@@ -11,164 +11,183 @@ export default class Yayaya {
   ball: any;
   absolutePositionValue: any;
   renderData: any;
+  commentRenderData: any;
   timeChecker: TimeChecker;
   canvas: any;
-  ctx: any;
+  ctx: CanvasRenderingContext2D;
   store: any;
   hands: {
     left: Hand,
     right: Hand
   };
+  comment: string;
   constructor(wrapper, ts, store) {
-      this.wrapper = wrapper;
-      this.yas = [];
-      this.ball = {};
-      this.hands = {
-        left: new Hand('left', 0, 0, {
-          width: 0,
-          height: 0
-        }),
-        right: new Hand('right', 0, 0, {
-          width: 0,
-          height: 0
-        })
-      };
-      this.absolutePositionValue = [];
-      this.renderData = {
-          stopAnimation: {},
-          stopStartAnimation: {},
-          stopEndAnimation: {},
-          lastTick: 0,
-          tickLength: 20,
-          tickCnt: 0,
-          velocity: 2,
-      };
-      this.timeChecker = new TimeChecker(ts);
-      this.store = store;
+    this.wrapper = wrapper;
+    this.yas = [];
+    this.ball = {};
+    this.hands = {
+      left: new Hand('left', 0, 0, {
+        width: 0,
+        height: 0
+      }),
+      right: new Hand('right', 0, 0, {
+        width: 0,
+        height: 0
+      })
+    };
+    this.absolutePositionValue = [];
+    this.renderData = {
+      stopAnimation: {},
+      stopStartAnimation: {},
+      stopEndAnimation: {},
+      lastTick: 0,
+      tickLength: 20,
+      tickCnt: 0,
+      velocity: 2,
+    };
+    this.timeChecker = new TimeChecker(ts);
+    this.store = store;
+    this.commentRenderData = {
+      lastTick: 0,
+      tickLength: 200,
+      tickCnt: 0,
+    }
   }
 
   init() {
-      this.canvas = document.createElement('canvas');
-      this.canvas.width = this.wrapper.clientWidth;
-      this.canvas.height = this.wrapper.clientHeight;
-      this.wrapper.append(this.canvas);
-      this.ctx = this.canvas.getContext('2d');
-      this.initYa();
-      this.initHands();
+    this.canvas = document.createElement('canvas');
+    this.canvas.width = this.wrapper.clientWidth;
+    this.canvas.height = this.wrapper.clientHeight;
+    this.wrapper.append(this.canvas);
+    this.ctx = this.canvas.getContext('2d');
+    this.initYa();
+    this.initHands();
   }
 
   async main(tFrame) {
-      this.renderData.stopAnimation = window.requestAnimationFrame( tFrame => this.main(tFrame) );
-      if (this.renderData.lastTick + this.renderData.tickLength <= tFrame) {
-          this.moveHands();
-          this.renderData.lastTick = tFrame;
-          this.renderData.tickCnt = this.renderData.tickCnt + 1;
-          if (this.checkEndedMoving() || !this.yas.some(ya => ya.isMoving)) {
-              if (this.renderData.velocity <= 0.1 && this.timeChecker.isResultTime()) {
-                  window.cancelAnimationFrame(this.renderData.stopAnimation);
-                  const res = await getGames();
-                  this.setBallPosition(res.data.data.results[0].result);
-                  setTimeout(() => {
-                      this.end(performance.now(), 1, {x: 0, y: this.absolutePositionValue[0].y} )
-                  }, 500);
-              } else {
-                  this.changePosition();
-                  this.moveYa();
-              }
-          } else {
-              this.moveYa();
-          }
+    this.renderData.stopAnimation = window.requestAnimationFrame( tFrame => this.main(tFrame) );
+    if (this.renderData.lastTick + this.renderData.tickLength <= tFrame) {
+      this.moveHands();
+      this.renderData.lastTick = tFrame;
+      this.renderData.tickCnt = this.renderData.tickCnt + 1;
+      if (this.checkEndedMoving() || !this.yas.some(ya => ya.isMoving)) {
+        if (this.renderData.velocity <= 0.1 && this.timeChecker.isResultTime()) {
+          window.cancelAnimationFrame(this.renderData.stopAnimation);
+          const res = await getGames();
+          this.setBallPosition(res.data.data.results[0].result);
+          setTimeout(() => {
+            this.end(performance.now(), 1, {x: 0, y: this.absolutePositionValue[0].y} )
+          }, 500);
+        } else {
+          this.changePosition();
+          this.moveYa();
+        }
+      } else {
+        this.moveYa();
       }
+    }
   }
 
   start(tFrame, step, position) {
-      if (step === 1 && position.y === this.absolutePositionValue[0].y - 50) {
-          step = 2;
-      } else if (step === 2 && position.y === this.absolutePositionValue[0].y) {
-          step = 3;
-      } else if (step ===3 && position.y === this.absolutePositionValue[0].y - 24) {
-          step = 4;
+    const startComment = ['어', '어서', '어서 오', '어서 오시', '어서 오시게', '어서 오시게.', ''];
+    if (this.commentRenderData.lastTick + this.commentRenderData.tickLength <= tFrame) {
+      this.commentRenderData.lastTick = tFrame;
+      const commentIdx = startComment.findIndex((comment) => comment === this.comment);
+      if (commentIdx > -1 && commentIdx + 1 < startComment.length) {
+        this.comment = startComment[commentIdx + 1];
+      } else if (commentIdx > -1 && commentIdx + 1 === startComment.length) {
+        this.comment = startComment[0];
+      } else {
+        this.comment = startComment[0];
       }
-      this.renderData.stopStartAnimation = window.requestAnimationFrame( tFrame => this.start(tFrame, step, position) );
-      if (this.renderData.lastTick + this.renderData.tickLength <= tFrame && this.timeChecker.isAnimationTime()) {
-          this.renderData.lastTick = tFrame;
-          if (step === 1 && position.y > this.absolutePositionValue[0].y - 50) {
-              position.y -= 2;
-          } else if (step === 2 && position.y < this.absolutePositionValue[0].y) {
-              position.y += 2;
-          } else if (step === 3 && position.y > this.absolutePositionValue[0].y - 24) {
-              position.y -= 2;
-          } else if (step === 4 && position.y < this.absolutePositionValue[0].y) {
-              position.y += 2;
-          }
-          this.yas.forEach(ya => {
-              ya.y = position.y;
-          });
-          this.render(true);
-          if (step === 4 && position.y === this.absolutePositionValue[0].y) {
-              window.cancelAnimationFrame(this.renderData.stopStartAnimation);
-              this.main(performance.now());
-          }
+    }
+    if (step === 1 && position.y === this.absolutePositionValue[0].y - 50) {
+      step = 2;
+    } else if (step === 2 && position.y === this.absolutePositionValue[0].y) {
+      step = 3;
+    } else if (step ===3 && position.y === this.absolutePositionValue[0].y - 24) {
+      step = 4;
+    }
+    this.renderData.stopStartAnimation = window.requestAnimationFrame( tFrame => this.start(tFrame, step, position) );
+    if (this.renderData.lastTick + this.renderData.tickLength <= tFrame && this.timeChecker.isAnimationTime()) {
+      this.renderData.lastTick = tFrame;
+      if (step === 1 && position.y > this.absolutePositionValue[0].y - 50) {
+        position.y -= 2;
+      } else if (step === 2 && position.y < this.absolutePositionValue[0].y) {
+        position.y += 2;
+      } else if (step === 3 && position.y > this.absolutePositionValue[0].y - 24) {
+        position.y -= 2;
+      } else if (step === 4 && position.y < this.absolutePositionValue[0].y) {
+        position.y += 2;
       }
+      this.yas.forEach(ya => {
+        ya.y = position.y;
+      });
+      if (step === 4 && position.y === this.absolutePositionValue[0].y) {
+        window.cancelAnimationFrame(this.renderData.stopStartAnimation);
+        this.main(performance.now());
+      }
+    }
+    this.render(true, true);
   }
 
   end(tFrame, step, position) {
-      if (position.y === this.absolutePositionValue[0].y - 50) {
-          step = 2;
+    if (position.y === this.absolutePositionValue[0].y - 50) {
+      step = 2;
+    }
+    this.renderData.stopStartAnimation = window.requestAnimationFrame( tFrame => this.end(tFrame, step, position) );
+    if (this.renderData.lastTick + this.renderData.tickLength <= tFrame) {
+      this.renderData.lastTick = tFrame;
+      if (step === 1 && position.y > this.absolutePositionValue[0].y - 50) {
+        position.y -= 2;
+      } else if (step === 2 && this.timeChecker.isOverTime()) {
+        this.store.refresh();
+        window.cancelAnimationFrame(this.renderData.stopStartAnimation);
       }
-      this.renderData.stopStartAnimation = window.requestAnimationFrame( tFrame => this.end(tFrame, step, position) );
-      if (this.renderData.lastTick + this.renderData.tickLength <= tFrame) {
-          this.renderData.lastTick = tFrame;
-          if (step === 1 && position.y > this.absolutePositionValue[0].y - 50) {
-              position.y -= 2;
-          } else if (step === 2 && this.timeChecker.isOverTime()) {
-              this.store.refresh();
-              window.cancelAnimationFrame(this.renderData.stopStartAnimation);
-          }
-          this.yas.forEach(ya => {
-              ya.y = position.y;
-          });
-          this.hands.left.degree = 0;
-          this.hands.right.degree = 0;
-          this.render(true);
-      }
+      this.yas.forEach(ya => {
+        ya.y = position.y;
+      });
+      this.hands.left.degree = 0;
+      this.hands.right.degree = 0;
+      this.render(true);
+    }
   }
 
   changePosition() {
-      if (this.renderData.velocity > 0.1 && this.timeChecker.isAnimationTime()) {
-          this.renderData.velocity = 2 - (0.05 * Math.round(((Date.now() - this.timeChecker.animationStartTimeStamp) / 50) / 8));
-      }
+    if (this.renderData.velocity > 0.1 && this.timeChecker.isAnimationTime()) {
+      this.renderData.velocity = 2 - (0.05 * Math.round(((Date.now() - this.timeChecker.animationStartTimeStamp) / 50) / 8));
+    }
 
-      const shuffledArray = shuffleArray(this.yas.map(ya => ya.position));
-      shuffledArray.forEach((v, idx) => {
-          const ya = this.yas[idx];
-          ya.prevPosition = ya.position;
-          ya.position = v;
-          ya.movingPerFrame =
-              ((this.absolutePositionValue[ya.position - 1].x - this.absolutePositionValue[ya.prevPosition - 1].x) /
-              (this.renderData.tickLength * this.renderData.velocity));
-          if (ya.prevPosition !== ya.position) {
-              ya.isMoving = true;
-          } else {
-              ya.isMoving = false;
-          }
-      });
+    const shuffledArray = shuffleArray(this.yas.map(ya => ya.position));
+    shuffledArray.forEach((v, idx) => {
+      const ya = this.yas[idx];
+      ya.prevPosition = ya.position;
+      ya.position = v;
+      ya.movingPerFrame =
+        ((this.absolutePositionValue[ya.position - 1].x - this.absolutePositionValue[ya.prevPosition - 1].x) /
+          (this.renderData.tickLength * this.renderData.velocity));
+      if (ya.prevPosition !== ya.position) {
+        ya.isMoving = true;
+      } else {
+        ya.isMoving = false;
+      }
+    });
   }
 
   checkEndedMoving() {
-      return this.yas
-          .filter(ya => ya.isMoving)
-          .some(ya => {
-              const destPosition = this.absolutePositionValue[ya.position - 1];
-              return ya.x < destPosition.x + 1 && ya.x > destPosition.x - 1;
-          });
+    return this.yas
+      .filter(ya => ya.isMoving)
+      .some(ya => {
+        const destPosition = this.absolutePositionValue[ya.position - 1];
+        return ya.x < destPosition.x + 1 && ya.x > destPosition.x - 1;
+      });
   }
 
   moveYa() {
-      this.yas.forEach(ya => {
-          ya.x = ya.x + ya.movingPerFrame;
-      });
-      this.render(false);
+    this.yas.forEach(ya => {
+      ya.x = ya.x + ya.movingPerFrame;
+    });
+    this.render(false);
   }
 
   moveHands() {
@@ -189,31 +208,31 @@ export default class Yayaya {
     }
   }
 
-   initYa() {
-       const yaImage = new Image();
-       const ballImage = new Image();
-       yaImage.onload = () => {
-           this.initYaPosition(yaImage);
-           this.changePosition();
-           ballImage.src = '/static/images/ball.png';
-       };
+  initYa() {
+    const yaImage = new Image();
+    const ballImage = new Image();
+    yaImage.onload = () => {
+      this.initYaPosition(yaImage);
+      this.changePosition();
+      ballImage.src = '/static/images/ball.png';
+    };
 
-       ballImage.onload = () => {
-           this.initBallPosition(1, ballImage);
-           this.render(true);
-           if (this.timeChecker.isReadyTime()) {
-             this.start(performance.now(), 1, {x: 0, y: this.absolutePositionValue[0].y});
-           } else if (this.timeChecker.isAnimationTime()) {
-             this.main(performance.now());
-           } else if (this.timeChecker.isResultTime()) {
-             this.end(performance.now(), 1, {x: 0, y: this.absolutePositionValue[0].y});
-           }
-       };
+    ballImage.onload = () => {
+      this.initBallPosition(1, ballImage);
+      this.render(true);
+      if (this.timeChecker.isReadyTime()) {
+        this.start(performance.now(), 1, {x: 0, y: this.absolutePositionValue[0].y});
+      } else if (this.timeChecker.isAnimationTime()) {
+        this.main(performance.now());
+      } else if (this.timeChecker.isResultTime()) {
+        this.end(performance.now(), 1, {x: 0, y: this.absolutePositionValue[0].y});
+      }
+    };
 
-       yaImage.src = '/static/images/cup.png';
-   }
+    yaImage.src = '/static/images/cup.png';
+  }
 
-   initHands() {
+  initHands() {
     const leftHandImage = new Image();
     this.hands.left.image = leftHandImage;
     this.hands.left.moveDirection = 'right';
@@ -229,7 +248,7 @@ export default class Yayaya {
 
     leftHandImage.src = '/static/images/left-hand.png';
     rightHandImage.src = '/static/images/right-hand.png';
-   }
+  }
 
   initLeftHandPosition() {
     // const imageWidth = this.canvas.width / 3;
@@ -263,27 +282,38 @@ export default class Yayaya {
     }
   }
 
-  render(withBall) {
-      this.ctx.clearRect(0,0, this.canvas.width, this.canvas.height);
-      if (withBall) {
-          this.drawBall();
-      }
-      this.drawHands();
-      this.drawYa();
+  render(withBall, withComment = false) {
+    this.ctx.clearRect(0,0, this.canvas.width, this.canvas.height);
+    if (withBall) {
+      this.drawBall();
+    }
+    this.drawHands();
+    this.drawYa();
+    if (withComment) {
+      this.drawComment();
+    }
+  }
+
+  drawComment() {
+    console.log(this.comment);
+    this.ctx.beginPath();
+    this.ctx.font = "20px Arial";
+    this.ctx.fillText(this.comment, 160, 60);
+    this.ctx.closePath();
   }
 
   drawYa() {
-      this.yas.forEach(ya => {
-          this.ctx.beginPath();
-          this.ctx.drawImage(ya.image, ya.x, ya.y, ya.imageInfo.width, ya.imageInfo.height);
-          this.ctx.closePath();
-      })
+    this.yas.forEach(ya => {
+      this.ctx.beginPath();
+      this.ctx.drawImage(ya.image, ya.x, ya.y, ya.imageInfo.width, ya.imageInfo.height);
+      this.ctx.closePath();
+    })
   }
 
   drawBall() {
-      this.ctx.beginPath();
-      this.ctx.drawImage(this.ball.image, this.ball.x, this.ball.y, this.ball.imageInfo.width, this.ball.imageInfo.height);
-      this.ctx.closePath();
+    this.ctx.beginPath();
+    this.ctx.drawImage(this.ball.image, this.ball.x, this.ball.y, this.ball.imageInfo.width, this.ball.imageInfo.height);
+    this.ctx.closePath();
   }
 
   drawHands() {
@@ -316,39 +346,39 @@ export default class Yayaya {
   }
 
   initBallPosition(position, ballImage) {
-      const ya = this.yas[position];
-      // const imageWidth = this.canvas.width / 10;
-      const imageWidth = 45;
-      const imageHeight = imageWidth * (ballImage.height / ballImage.width);
-      const x = (ya.x + (ya.imageInfo.width / 2)) - (imageWidth / 2);
-      const y = ya.y + ya.imageInfo.height - imageHeight;
-      this.ball = new Ball(x, y, {
-          width: imageWidth,
-          height: imageHeight
-      });
-      this.ball.image = ballImage;
+    const ya = this.yas[position];
+    // const imageWidth = this.canvas.width / 10;
+    const imageWidth = 45;
+    const imageHeight = imageWidth * (ballImage.height / ballImage.width);
+    const x = (ya.x + (ya.imageInfo.width / 2)) - (imageWidth / 2);
+    const y = ya.y + ya.imageInfo.height - imageHeight;
+    this.ball = new Ball(x, y, {
+      width: imageWidth,
+      height: imageHeight
+    });
+    this.ball.image = ballImage;
   }
 
   initYaPosition(yaImage) {
-      // const imageWidth = this.canvas.width / 4;
-      const imageWidth = 83;
-      const imageHeight = imageWidth * (yaImage.height / yaImage.width);
-      // const eachArea = this.canvas.width / 3;
-      const eachArea = 400 / 3;
-      // const leftSpace = (eachArea - this.canvas.width / 4) / 2;
-      const leftSpace = 135;
-      [1, 2, 3].forEach((position, index) => {
-          const x = eachArea * index + leftSpace;
-          // const y = (this.canvas.width / 2) - imageHeight / 2;
-          // const y = 270;
-          const y = 270 - imageHeight;
-          const ya = new Ya(position, x, y, {
-            width: imageWidth,
-            height: imageHeight
-          });
-          ya.image = yaImage;
-          this.yas.push(ya);
-          this.absolutePositionValue.push({x, y});
+    // const imageWidth = this.canvas.width / 4;
+    const imageWidth = 83;
+    const imageHeight = imageWidth * (yaImage.height / yaImage.width);
+    // const eachArea = this.canvas.width / 3;
+    const eachArea = 400 / 3;
+    // const leftSpace = (eachArea - this.canvas.width / 4) / 2;
+    const leftSpace = 135;
+    [1, 2, 3].forEach((position, index) => {
+      const x = eachArea * index + leftSpace;
+      // const y = (this.canvas.width / 2) - imageHeight / 2;
+      // const y = 270;
+      const y = 270 - imageHeight;
+      const ya = new Ya(position, x, y, {
+        width: imageWidth,
+        height: imageHeight
       });
+      ya.image = yaImage;
+      this.yas.push(ya);
+      this.absolutePositionValue.push({x, y});
+    });
   }
 }
